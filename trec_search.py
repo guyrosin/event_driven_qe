@@ -1,27 +1,27 @@
 import logging
-import os
 from enum import Enum, auto
 from pathlib import Path
 
 from tqdm import tqdm
-from trectools import TrecTopics, TrecTerrier, TrecQrel, TrecEval
+from trectools import TrecEval, TrecQrel, TrecTerrier, TrecTopics
 
 import utils
 from models_manager import ModelsManager, SpecificModelType
 from qe_multiple_entities import MultipleEntitiesQEMethod, QEMultipleEntities
 from qe_single_entity import QEMethod, QESingleEntity
 from word2vec_wiki2vec_model import Word2VecWiki2VecModel
-from word_onthology import WordOnthology, EventDetector
+from word_onthology import EventDetector, WordOnthology
 
 terrier_path = "/path-to-terrier/terrier-project-5.1/bin"
 trec_corpora_dir = '/path-to-trec-directory'
+temporal_models_dir = 'path-to-temporal-models-dir'
 
 
 class Dataset(Enum):
-    Robust04 = (auto(),)
-    AP_Disk1_3 = (auto(),)
-    WSJ_Disk1_2 = (auto(),)
-    TREC12 = (auto(),)
+    Robust04 = auto()
+    AP_Disk1_3 = auto()
+    WSJ_Disk1_2 = auto()
+    TREC12 = auto()
 
 
 dataset_to_qrel_file = {
@@ -133,9 +133,8 @@ class TrecTemporalHelper(TrecHelper):
         )
 
     def build_models(self, just_global=False):
-        models_dir = 'path-to-temporal-models-dir'
         models_manager = ModelsManager(
-            models_dir,
+            temporal_models_dir,
             global_model_path=wiki2vec_global_model_path,
             global_model_type=SpecificModelType.Wiki2Vec,
             specific_model_type=SpecificModelType.Wiki2Vec,
@@ -188,7 +187,7 @@ def read_topics_from_file(dataset, data_dir, topics_file):
     topic_title_regex = None if dataset == Dataset.Robust04 else r'Topic:\s+(.+)'
     querytext_tag = 'title'
     topics.read_topics_from_file(
-        os.path.join(data_dir, topics_file),
+        data_dir / topics_file,
         topic_tag='top',
         numberid_tag='num',
         querytext_tag=querytext_tag,
@@ -240,10 +239,8 @@ def search(
     show_output=True,
     include_unexpanded=False,
 ):
-    topics_file_path = os.path.join(
-        data_dir, f'topics_to_search_by_{qe_method.name}.txt'
-    )
-    data_dir = os.path.abspath(data_dir)  # for the output run file
+    topics_file_path = data_dir / f'topics_to_search_by_{qe_method.name}.txt'
+    data_dir = str(data_dir.absolute())  # for the output run file
     final_topics = {}
     if expansions:  # apply weights
         for topic_id, topic in tqdm(topics.topics.items()):
@@ -274,7 +271,7 @@ def search(
             logging.warning('Nothing to search for')
             return
     TrecTopics(final_topics).printfile(
-        fileformat=f'terrier',
+        fileformat='terrier',
         filename=topics_file_path,
         debug=show_output,
         single_line_format=True,
@@ -323,15 +320,11 @@ def create_helper(
 
 
 if __name__ == "__main__":
-    data_dir = Path('data').absolute()
     dataset = Dataset.Robust04
     qe_method = MultipleEntitiesQEMethod.events_temporal
     k = 100
-    filter_topics_for_events = False
     event_detector = EventDetector.WikipediaFrequency
-    use_projected_models = (
-        True if qe_method == MultipleEntitiesQEMethod.events_temporal else False
-    )
+    use_projected_models = qe_method == MultipleEntitiesQEMethod.events_temporal
     show_output = False
     run_filename_template = 'run.{}.{}.k{}.txt'
     # QMIX is used for weighting (interpolation parameter between the LM and MLE)

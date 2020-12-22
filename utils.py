@@ -3,9 +3,8 @@ from functools import lru_cache
 import gensim
 import numpy as np
 from gensim.parsing import preprocessing
-from nltk import WordNetLemmatizer, PerceptronTagger
-from nltk.corpus import stopwords
-from nltk.corpus import wordnet
+from nltk import PerceptronTagger, WordNetLemmatizer
+from nltk.corpus import stopwords, wordnet
 
 wnl = WordNetLemmatizer()
 pos_tagger = PerceptronTagger()
@@ -14,7 +13,7 @@ stopwords = stopwords.words("english")
 
 def get_top_items(dict_or_list, n=None, sort_by_index=1, ascending=False):
     """
-    :returns the top items from a dictionary or a list of tuples
+    Return the top items from a dictionary or a list of tuples
     """
     if not n:
         n = len(dict_or_list)
@@ -26,19 +25,17 @@ def get_top_items(dict_or_list, n=None, sort_by_index=1, ascending=False):
                 reverse=not ascending,
             )[:n]
         )
-    else:
-        return sorted(
-            dict_or_list, key=lambda item: item[sort_by_index], reverse=not ascending
-        )[:n]
+    return sorted(
+        dict_or_list, key=lambda item: item[sort_by_index], reverse=not ascending
+    )[:n]
 
 
 def normalize(dict_or_list):
     if isinstance(dict_or_list, dict):
         factor = 1 / np.nansum(list(dict_or_list.values()))
         return {key: val * factor for key, val in dict_or_list.items()}
-    else:
-        factor = 1 / np.nansum(dict_or_list)
-        return [val * factor if val is not None else val for val in dict_or_list]
+    factor = 1 / np.nansum(dict_or_list)
+    return [val * factor if val is not None else val for val in dict_or_list]
 
 
 def tokenize(
@@ -109,7 +106,7 @@ def lemmatize_words(words, wnl, pos_tagger=None):
 
 def argpartition(l, n, highest=True):
     """
-    gets the indices of the n items with the highest values from the list l
+    Get the indices of the `n` items with the highest values from the list `l`
     """
     if n >= len(l) or n == 0:
         return list(range(len(l)))

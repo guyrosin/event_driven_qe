@@ -1,9 +1,9 @@
+import json
 import logging
 from collections import defaultdict
 from concurrent.futures.process import ProcessPoolExecutor
 from pathlib import Path
 
-import json
 from scipy.optimize import minimize
 from scipy.spatial import distance
 from sklearn.metrics import mean_squared_error
@@ -28,7 +28,9 @@ def calc_mse(x, locations, distances, distance_metric):
 
 
 def find_anchor_words(target_model, source_model, word, anchors_num):
-    # find anchor words that belong to the target model using an exponential backoff-like method
+    """
+    Find anchor words that belong to the target model using an exponential backoff-like method
+    """
     anchor_words = []
     coefficient = max(200, anchors_num * 15)
     i = 0

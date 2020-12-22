@@ -87,20 +87,20 @@ class ModelsManager(object):
             model.init_sims()
 
     def load_models(
-        self, years=None, type=None, update_time_range=True, just_global=False
+        self, years=None, model_type=None, update_time_range=True, just_global=False
     ):
-        if self.year_to_model_inner:  # already loaded
+        if self.year_to_model_inner:  # skip if already loaded
             return
         if just_global:
             self.from_year, self.to_year = min(years), max(years)
             update_time_range = False
             years = [STATIC_YEAR]
             logging.info(
-                f"loading {type.name + ' ' if type else ''}global model from '{self.data_dir_name}'"
+                f"loading {model_type.name + ' ' if model_type else ''}global model from '{self.data_dir_name}'"
             )
         else:
             logging.info(
-                f"loading {type.name + ' ' if type else ''}models from '{self.data_dir_name}'"
+                f"loading {model_type.name + ' ' if model_type else ''}models from '{self.data_dir_name}'"
             )
         self._load_w2v_models(years)
         if not self.year_to_model_inner:

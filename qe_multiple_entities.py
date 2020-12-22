@@ -1,9 +1,9 @@
+import json
 import logging
-from enum import auto, Enum
+from enum import Enum, auto
 from functools import lru_cache
 
 import numpy as np
-import json
 from nltk import PerceptronTagger, WordNetLemmatizer
 from sqlitedict import SqliteDict
 
@@ -51,7 +51,7 @@ class QEMultipleEntities:
         self.wnl = WordNetLemmatizer()
         self.lemmatize = lru_cache()(utils.lemmatize_word)
         self.event_to_top_tfidf = SqliteDict(
-            f'data/event_to_top_tfidf_100.sqlite', flag='r'
+            'data/event_to_top_tfidf_100.sqlite', flag='r'
         )
         self.event_detector = (
             event_detector if event_detector else EventDetector.WikipediaFrequency
@@ -280,7 +280,7 @@ class QEMultipleEntities:
                 event_word_score[event] = word_score
 
         if not event_word_score:
-            logging.info(f'* No candidate expansions were found')
+            logging.info('* No candidate expansions were found')
             return None
 
         # aggregate all words of all events and sort the words
@@ -313,7 +313,7 @@ class QEMultipleEntities:
         )
 
         if not year_event_score:  # no events were found
-            logging.info(f'* No events were found beyond the threshold')
+            logging.info('* No events were found beyond the threshold')
             return None
 
         # find relevant words based on the events
@@ -323,7 +323,7 @@ class QEMultipleEntities:
             for (event, score) in event_scores
         ]
         if not event_scores:  # no events were found
-            logging.info(f'** No events were found beyond the threshold')
+            logging.info('** No events were found beyond the threshold')
             return None
         max_words_per_event = max(10, k // len(event_scores) * 2)
         word_scores = self.find_words_based_on_events(

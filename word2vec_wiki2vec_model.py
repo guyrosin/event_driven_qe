@@ -23,16 +23,15 @@ class Word2VecWiki2VecModel(Word2VecModel):
         stemmed = self.stemmer.stem(word)
         if stemmed in self.wv:
             return stemmed
-        entity_name = self.entity_prefix + '_'.join([w for w in re.split('[ _]', word)])
-        if entity_name in self.wv:  # check if 'word' is an entity
-            return entity_name
-        entity_name = self.entity_prefix + '_'.join(re.split('[ _]', word)).title()
-        if entity_name in self.wv:  # check if 'word' is an entity
-            return entity_name
-        entity_name = self.entity_prefix + '_'.join(re.split('[ _]', word)).capitalize()
-        if entity_name in self.wv:  # check if 'word' is an entity
-            return entity_name
-        return None
+        # check entity variations of the given word
+        variations = [
+            self.entity_prefix + '_'.join([w for w in re.split('[ _]', word)]),
+            self.entity_prefix + '_'.join(re.split('[ _]', word)).title(),
+            self.entity_prefix + '_'.join(re.split('[ _]', word)).capitalize(),
+        ]
+        for variation in variations:
+            if variation in self.wv:
+                return variation
 
     def get_word(self, word_or_entity):
         if self.is_entity(word_or_entity):

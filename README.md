@@ -19,6 +19,13 @@ This repository provides the data and implementation of the paper:
 - Run `trec_search.py` to perform retrieval with or without query expansion and evaluate, after setting the relevant parameters (model paths, dataset, QE method, etc.).
 
 
+## Pretrained Word Embeddings
+The word embeddings used in the paper can be downloaded from [here](https://karpef.cs.technion.ac.il/index.php/s/YA3G3iqDZyagnFH/download).
+
+The embeddings were created using [Gensim](https://github.com/RaRe-Technologies/gensim).
+Each model is based on data from a single year of the New York Times, and is then enriched with events from Wikipedia.
+There are 38 models in total, for the years of 1981-2018.
+
 ## Dependencies
 
 - Python 3.7
